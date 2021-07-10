@@ -11,21 +11,25 @@
 
     #app {
       display: flex;
-      font-size: 2vw;
       align-items: center;
-      max-width: 100%;
       flex-wrap: wrap;
+      font-size: 3em;
+    }
 
+    span {
+      width: .6em;
     }
 
     p {
       margin: 0px;
       text-align: center;
-      max-width: 1em;
+      font-weight: bolder;
     }
 
     p.err {
-      font-size: 1vw;
+      margin-bottom: .8em;
+      font-size: .8em;
+      font-weight:  lighter;
     }
 
     p.correct {
@@ -65,8 +69,8 @@
   <script type="module">
     import init from "./pkg/typing.js";
     import * as typing from "./pkg/typing.js";
-        const defaultCopy = `If enacted, the plan could reshape the global economy, altering where corporations choose to operate, who gets to tax them and the incentives that nations offer to lure investment. But major details remain to be worked out ahead of an October deadline to finalize the agreement and resistance is mounting from businesses, which could soon face higher tax bills, as well as from small, but pivotal, low-tax countries such as Ireland, which would see their economic models turned upside down.  After spending the weekend huddled in the halls of an ancient Venetian naval shipyard, the top economic officials from the Group of 20 nations agreed to forge ahead. They formally threw their support behind a proposal for a global minimum tax of at least 15 percent that each country would adopt and new rules that would require large global businesses, including technology giants like Amazon and Facebook, to pay taxes in countries where their goods or services are sold, even if they have no physical presence there.`;
-        const defaultDuration = 10;
+        const defaultCopy = `If enacted, the plan could reshape the global economy, altering where corporations choose to operate, who gets to tax them and the incentives that nations offer to lure investment. But major details remain to be worked out ahead of an October deadline to finalize the agreement and resistance is mounting from businesses, which could soon face higher tax bills, as well as from small, but pivotal, low-tax countries such as Ireland, which would see their economic models turned upside down. After spending the weekend huddled in the halls of an ancient Venetian naval shipyard, the top economic officials from the Group of 20 nations agreed to forge ahead.`;
+        const defaultDuration = 30;
 
     const urlSearchParams = new URLSearchParams(window.location.search);
     const params = Object.fromEntries(urlSearchParams.entries());
@@ -157,6 +161,7 @@
         for (let i = 0; i < copy.length; i++) {
           domTyped.push(document.getElementById(`domTyped${i}`));
         }
+
       });
   </script>
 </body>
