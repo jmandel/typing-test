@@ -130,18 +130,21 @@
           });
         });
 
-        setInterval(() => {
+      function displayScore(){
+          window.requestAnimationFrame(displayScore);
           if (completed || paused) { return; }
           let rate = 1000 * score / (new Date().getTime() - startedAt);
           let elapsed = .001 * (new Date().getTime() - startedAt);
-          let formattedRate = String(rate.toFixed(2)).padStart(4, '&nbsp;');
-          let formattedRemaining = String((duration - elapsed).toFixed(2)).padStart(3, '&nbsp;');
-          scoreBox.innerText = `${formattedRate} @ ${formattedRemaining}s`;
+          let formattedRate = String(rate.toFixed(2)).padStart(5, ' ').replaceAll(' ', '&nbsp;');
+          let formattedRemaining = String((duration - elapsed).toFixed(2)).padStart(6, ' ').replaceAll(' ', '&nbsp;');
+          scoreBox.innerHTML = `${formattedRate} ${formattedRemaining}s`;
           if (elapsed > duration) {
             completed = true;
-            scoreBox.innerText = `${formattedRate} 👍`;
+            scoreBox.innerHTML = `${formattedRate} 👍`;
           }
-        }, 30);
+        }
+        displayScore();
+
         let built = [];
         let domTyped = [];
 
