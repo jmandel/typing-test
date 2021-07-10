@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>typing test</title>
+  <style>
+    html {
+      font-family: monospace;
+    }
+
+    #app {
+      display: flex;
+      font-size: 2vw;
+      align-items: center;
+      max-width: 100%;
+      flex-wrap: wrap;
+
+    }
+
+    p {
+      margin: 0px;
+      text-align: center;
+      max-width: 1em;
+    }
+
+    p.err {
+      font-size: 1vw;
+    }
+
+    p.correct {
+      background: lightgreen;
+    }
+
+    p.incorrect {
+      background: lightpink;
+    }
+
+    #score {
+      z-index: 8;
+      position: fixed;
+      bottom: 0px;
+      left: 0px;
+      width: 100%;
+      opacity: 50%;
+      font-size: 10vw;
+    }
+
+    input {
+      z-index: 10;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      opacity: 0%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <input AUTOFOCUS id="log"></input>
+  <div id="score"></div>
+  <script type="module">
+    import init from "./pkg/typing.js";
+    import * as typing from "./pkg/typing.js";
+        const defaultCopy = `If enacted, the plan could reshape the global economy, altering where corporations choose to operate, who gets to tax them and the incentives that nations offer to lure investment. But major details remain to be worked out ahead of an October deadline to finalize the agreement and resistance is mounting from businesses, which could soon face higher tax bills, as well as from small, but pivotal, low-tax countries such as Ireland, which would see their economic models turned upside down.  After spending the weekend huddled in the halls of an ancient Venetian naval shipyard, the top economic officials from the Group of 20 nations agreed to forge ahead. They formally threw their support behind a proposal for a global minimum tax of at least 15 percent that each country would adopt and new rules that would require large global businesses, including technology giants like Amazon and Facebook, to pay taxes in countries where their goods or services are sold, even if they have no physical presence there.`;
+        const defaultDuration = 10;
+
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+
+    function step(alignment, e) {
+      if (e.data && (e.inputType === "insertText" || e.inputType === "insertFromPaste")) {
+        alignment.type_into_b(e.data);
+      } else if (e.inputType === "deleteContentBackward") {
+        alignment.backspace_into_b(1);
+      } else if (e.inputType === "deleteWordBackward") {
+        alignment.backword_into_b(1);
+      }
+      let best = alignment.best_scored_alignment();
+      const pairs = best.alignment().match(/../g) || [];
+      let built = pairs.reduce((acc, [a, b]) => {
+        if (a !== "_") {
+          acc.built.push(acc.dangling + b);
+          acc.dangling = "";
+        } else {
+          acc.dangling += b;
+        }
+        return acc;
+      }, { dangling: "", built: [] }).built;
+      return { built, score: best.score() };
+    };
+    init()
+      .then(() => {
+        console.log("initialized.", typing);
+
+        let copy = params.copy || defaultCopy;
+        let duration = params.duration || defaultDuration;
+
+        let paused = true;
+        let completed = false;
+        let startedAt = 0;
+        let score = 0;
+
+
+        if (window.location.search)
+          console.log("create");
+        const alignment = typing.AlignmentTable.new(copy);
+
+        let scoreBox = document.getElementById("score");
+        document.getElementById("log").addEventListener("beforeinput", (e) => {
+          if (completed) return;
+          let aligned = step(alignment, e);
+          score = aligned.score;
+          let built = aligned.built;
+
+          if (paused && built.length > 0) {
+            paused = false;
+            startedAt = new Date().getTime();
+            console.log("STARTD");
+          }
+
+          domTyped.forEach((d, i) => {
+            let target = "&nbsp;";
+            if (built[i] && built[i] !== " ") { target = built[i]; }
+            d.innerHTML = target;
+            d.setAttribute("class", `${built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank"} err`);
+          });
+        });
+
+        setInterval(() => {
+          if (completed || paused) { return; }
+          let rate = 1000 * score / (new Date().getTime() - startedAt);
+          let elapsed = .001 * (new Date().getTime() - startedAt);
+          let formattedRate = String(rate.toFixed(2)).padStart(4, '&nbsp;');
+          let formattedRemaining = String((duration - elapsed).toFixed(2)).padStart(3, '&nbsp;');
+          scoreBox.innerText = `${formattedRate} @ ${formattedRemaining}s`;
+          if (elapsed > duration) {
+            completed = true;
+            scoreBox.innerText = `${formattedRate} 👍`;
+          }
+        }, 30);
+        let built = [];
+        let domTyped = [];
+
+        const b = document.getElementById("app").innerHTML = `${copy.split("").map((c, i) => `
+          <span>
+            <p>${c != " " ? c : "&nbsp;"}</p>
+            <p id="domTyped${i}" class="err">${built[i] || "&nbsp;"}</p>
+          </span>`).join("")}`;
+
+        for (let i = 0; i < copy.length; i++) {
+          domTyped.push(document.getElementById(`domTyped${i}`));
+        }
+      });
+  </script>
+</body>
+
+</html>

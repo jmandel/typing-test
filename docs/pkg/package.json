@@ -1,0 +1,12 @@
+{
+  "name": "typing",
+  "version": "0.1.0",
+  "files": [
+    "typing_bg.wasm",
+    "typing.js",
+    "typing.d.ts"
+  ],
+  "module": "typing.js",
+  "types": "typing.d.ts",
+  "sideEffects": false
+}
