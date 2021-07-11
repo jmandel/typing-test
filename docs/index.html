@@ -16,7 +16,7 @@
       font-size: 3em;
     }
 
-    span {
+    span.letter {
       width: .6em;
     }
 
@@ -31,6 +31,7 @@
       margin-bottom: .8em;
       font-size: .8em;
       font-weight: lighter;
+      overflow-x: hidden;
     }
 
     p.correct {
@@ -59,6 +60,13 @@
       width: 100%;
       height: 100%;
       opacity: 0%;
+    }
+
+    span.word-wrapper {
+      //background: blue;
+      //margin: 1px;
+      display: flex;
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -179,14 +187,13 @@
           scoreBox.innerHTML = (enableDebug ? debug : "") + `${formattedRate} ${formattedRemaining}s`;
 
           if (completed && completedAt === 0) {
-            console.log("Liock in ", timeToNow)
             completedAt = timeToNow;
           }
 
           if (!enableDebug && (completed || (elapsed > duration))) {
             completed = true;
             log && log.parentNode?.removeChild(log);
-            scoreBox.innerHTML = `${formattedRate} 👍`;
+            scoreBox.innerHTML = `${formattedRate} ${rate > 2 ? '👍' : '👎'}`
           }
         }
         displayScore();
@@ -194,11 +201,19 @@
         let built = [];
         let domTyped = [];
 
-        const b = document.getElementById("app").innerHTML = `${copy.split("").map((c, i) => `
-          <span>
+        let letterCount = 0;
+        let totalWords = copy.split(" ").length;
+        const b = document.getElementById("app").innerHTML = copy.split(" ").map((w, i) => {
+          if (i < totalWords - 1) {
+            return w + " "
+          } else {
+            return w
+          }
+        }).map(segment => `<span class="word-wrapper">${segment.split("").map((c, i) => `
+          <span class="letter">
             <p>${c != " " ? c : "&nbsp;"}</p>
-            <p id="domTyped${i}" class="err">${built[i] || "&nbsp;"}</p>
-          </span>`).join("")}`;
+            <p id="domTyped${letterCount++}" class="err">${built[i] || "&nbsp;"}</p>
+          </span>`).join("")}</span>`).join("");
 
         for (let i = 0; i < copy.length; i++) {
           domTyped.push(document.getElementById(`domTyped${i}`));
