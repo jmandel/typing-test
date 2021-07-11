@@ -71,7 +71,7 @@
     import init from "./pkg/typing.js";
     import * as typing from "./pkg/typing.js";
     // const defaultCopy = `this is a simple paragraph that is meant to be nice and easy to type which is why there will be mommas no periods or any capital letters so i guess this means that it cannot really be considered a paragraph but just a series of run on sentences this should help you get faster at typing as im trying not to use too many difficult words in it although testa one two thireewijef owejf oweijf owiej foweij foiwj ewoifj euwej foiwej fiow ejfoijw eiofj fr`
-    const defaultCopy = `this is a simple paragraph that is meant to be nice and easy to type which is why there will be mommas no periods or any capital letters so i guess this means that it cannot really be considered a paragraph but just a series of run on sentences .`
+    const defaultCopy = `Democrats and Republicans are already jockeying for a crucial voting bloc that soured on Donald Trump, tilted to Joe Biden and now holds the key to the second half of the president's term.`;
     console.log(defaultCopy.length)
     const defaultDuration = 30;
 
@@ -129,6 +129,7 @@
         let paused = true;
         let completed = false;
         let startedAt = 0;
+        let completedAt = 0;
         let score = 0;
 
         const alignment = typing.AlignmentTable.new(copy);
@@ -160,19 +161,31 @@
             d.innerHTML = target;
             d.setAttribute("class", `${built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank"} err`);
           });
+
+          if (built.length === copy.length) {
+            completed = true
+          }
         });
 
         function displayScore() {
           window.requestAnimationFrame(displayScore);
-          if (!enableDebug && (completed || paused)) { return; }
-          let rate = 1000 * score / (new Date().getTime() - startedAt);
-          let elapsed = .001 * (new Date().getTime() - startedAt);
+          if (!enableDebug && (paused)) { return; }
+          let timeToNow = completedAt !== 0 ? completedAt : new Date().getTime();
+          let rate = 1000 * score / (timeToNow - startedAt);
+          let elapsed = .001 * (timeToNow - startedAt);
+
           let formattedRate = String(rate.toFixed(2)).padStart(5, ' ').replaceAll(' ', '&nbsp;');
           let formattedRemaining = String((duration - elapsed).toFixed(2)).padStart(6, ' ').replaceAll(' ', '&nbsp;');
           scoreBox.innerHTML = (enableDebug ? debug : "") + `${formattedRate} ${formattedRemaining}s`;
-          if (!enableDebug && elapsed > duration) {
+
+          if (completed && completedAt === 0) {
+            console.log("Liock in ", timeToNow)
+            completedAt = timeToNow;
+          }
+
+          if (!enableDebug && (completed || (elapsed > duration))) {
             completed = true;
-            log.parentNode.removeChild(log);
+            log && log.parentNode?.removeChild(log);
             scoreBox.innerHTML = `${formattedRate} 👍`;
           }
         }
