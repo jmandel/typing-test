@@ -1,3 +1,5 @@
+use std::usize;
+
 use wasm_bindgen::prelude::*;
 
 use crate::CameFrom::Match;
@@ -60,10 +62,11 @@ pub struct AlignmentTable {
 #[wasm_bindgen]
 impl AlignmentTable {
     pub fn new(a: &str) -> AlignmentTable {
-        let capacity = (1 + a.len()) * (1 + 2 * a.len());
+        let blen = (a.len() as f32 * 1.25) as usize;
+        let capacity = (1 + a.len()) * (1 + blen);
         let scratch: Vec<Option<(isize, CameFrom)>> = vec![None; capacity];
         let mut ret = AlignmentTable {
-            b: String::with_capacity(capacity),
+            b: String::with_capacity(blen),
             a: a.to_string(),
             alignment_matrix: scratch,
             scoring_rubric: Box::new(SimpleScoringRubric {}),
