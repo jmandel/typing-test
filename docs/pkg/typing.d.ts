@@ -17,16 +17,19 @@ export class AlignmentTable {
   score_at(row: number, col: number): number;
 /**
 * @param {string} bitems
+* @returns {number}
 */
-  type_into_b(bitems: string): void;
+  type_into_b(bitems: string): number;
 /**
 * @param {number} count
+* @returns {number}
 */
-  backspace_into_b(count: number): void;
+  backspace_into_b(count: number): number;
 /**
 * @param {number} count
+* @returns {number}
 */
-  backword_into_b(count: number): void;
+  backword_into_b(count: number): number;
 /**
 * @param {number} previous_b_length
 * @returns {boolean | undefined}
@@ -61,9 +64,9 @@ export interface InitOutput {
   readonly __wbg_alignmenttable_free: (a: number) => void;
   readonly alignmenttable_new: (a: number, b: number) => number;
   readonly alignmenttable_score_at: (a: number, b: number, c: number) => number;
-  readonly alignmenttable_type_into_b: (a: number, b: number, c: number) => void;
-  readonly alignmenttable_backspace_into_b: (a: number, b: number) => void;
-  readonly alignmenttable_backword_into_b: (a: number, b: number) => void;
+  readonly alignmenttable_type_into_b: (a: number, b: number, c: number) => number;
+  readonly alignmenttable_backspace_into_b: (a: number, b: number) => number;
+  readonly alignmenttable_backword_into_b: (a: number, b: number) => number;
   readonly alignmenttable_align: (a: number, b: number) => number;
   readonly alignmenttable_best_scored_alignment: (a: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

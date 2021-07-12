@@ -122,23 +122,29 @@ export class AlignmentTable {
     }
     /**
     * @param {string} bitems
+    * @returns {number}
     */
     type_into_b(bitems) {
         var ptr0 = passStringToWasm0(bitems, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.alignmenttable_type_into_b(this.ptr, ptr0, len0);
+        var ret = wasm.alignmenttable_type_into_b(this.ptr, ptr0, len0);
+        return ret >>> 0;
     }
     /**
     * @param {number} count
+    * @returns {number}
     */
     backspace_into_b(count) {
-        wasm.alignmenttable_backspace_into_b(this.ptr, count);
+        var ret = wasm.alignmenttable_backspace_into_b(this.ptr, count);
+        return ret >>> 0;
     }
     /**
     * @param {number} count
+    * @returns {number}
     */
     backword_into_b(count) {
-        wasm.alignmenttable_backword_into_b(this.ptr, count);
+        var ret = wasm.alignmenttable_backword_into_b(this.ptr, count);
+        return ret >>> 0;
     }
     /**
     * @param {number} previous_b_length

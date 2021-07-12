@@ -103,19 +103,21 @@ impl AlignmentTable {
         self.get_alignment_at((row, col)).unwrap().0
     }
 
-    pub fn type_into_b(&mut self, bitems: &str) {
+    pub fn type_into_b(&mut self, bitems: &str) -> usize {
         self.b.push_str(bitems);
         self.initialize_new_rows(bitems.len());
         self.align(self.b.len() - bitems.len());
+        self.b.len()
     }
 
-    pub fn backspace_into_b(&mut self, count: usize) {
+    pub fn backspace_into_b(&mut self, count: usize) -> usize {
         for _c in 0..count {
             self.b.pop();
         }
+        self.b.len()
     }
 
-    pub fn backword_into_b(&mut self, count: usize) {
+    pub fn backword_into_b(&mut self, count: usize) -> usize {
         for _c in 0..count {
             while self.b.pop().unwrap_or('_') == ' '{ }
             while self.b.pop().unwrap_or(' ') != ' '{ }
@@ -123,6 +125,7 @@ impl AlignmentTable {
         if self.b.len() > 0 {
             self.b.push(' ')
         }
+        self.b.len()
     }
 
 
