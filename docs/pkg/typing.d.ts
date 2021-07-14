@@ -2,6 +2,9 @@
 /* eslint-disable */
 /**
 */
+export function init_panic_hook(): void;
+/**
+*/
 export class AlignmentTable {
   free(): void;
 /**
@@ -15,6 +18,11 @@ export class AlignmentTable {
 * @returns {number}
 */
   score_at(row: number, col: number): number;
+/**
+* @param {string} bitems
+* @returns {number}
+*/
+  replace_b(bitems: string): number;
 /**
 * @param {string} bitems
 * @returns {number}
@@ -64,11 +72,13 @@ export interface InitOutput {
   readonly __wbg_alignmenttable_free: (a: number) => void;
   readonly alignmenttable_new: (a: number, b: number) => number;
   readonly alignmenttable_score_at: (a: number, b: number, c: number) => number;
+  readonly alignmenttable_replace_b: (a: number, b: number, c: number) => number;
   readonly alignmenttable_type_into_b: (a: number, b: number, c: number) => number;
   readonly alignmenttable_backspace_into_b: (a: number, b: number) => number;
   readonly alignmenttable_backword_into_b: (a: number, b: number) => number;
   readonly alignmenttable_align: (a: number, b: number) => number;
   readonly alignmenttable_best_scored_alignment: (a: number) => number;
+  readonly init_panic_hook: () => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;

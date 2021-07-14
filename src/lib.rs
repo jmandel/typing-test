@@ -1,6 +1,9 @@
 use std::usize;
 
+extern crate console_error_panic_hook;
+
 use wasm_bindgen::prelude::*;
+extern crate web_sys;
 
 use crate::CameFrom::Match;
 use crate::CameFrom::SkipA;
@@ -62,6 +65,7 @@ pub struct AlignmentTable {
 #[wasm_bindgen]
 impl AlignmentTable {
     pub fn new(a: &str) -> AlignmentTable {
+        init_panic_hook();
         let blen = (a.len() as f32 * 1.25) as usize;
         let capacity = (1 + a.len()) * (1 + blen);
         let scratch: Vec<Option<(isize, CameFrom)>> = vec![None; capacity];
@@ -100,7 +104,26 @@ impl AlignmentTable {
     }
 
     pub fn score_at(&self, row: usize, col: usize) -> isize {
-        self.get_alignment_at((row, col)).unwrap().0
+        let ret = self.get_alignment_at((row, col)).unwrap().0;
+        ret
+    }
+
+    pub fn replace_b(&mut self, bitems: &str) -> usize {
+        let common_prefix = bitems
+            .chars()
+            .zip(self.b.chars())
+            .take_while(|(a, b)| a == b)
+            .count();
+
+        self.b.truncate(common_prefix);
+
+        self.b.push_str(&bitems[common_prefix..]);
+
+        self.initialize_new_rows(bitems.len() - common_prefix);
+
+        self.align(common_prefix);
+
+        common_prefix
     }
 
     pub fn type_into_b(&mut self, bitems: &str) -> usize {
@@ -119,15 +142,14 @@ impl AlignmentTable {
 
     pub fn backword_into_b(&mut self, count: usize) -> usize {
         for _c in 0..count {
-            while self.b.pop().unwrap_or('_') == ' '{ }
-            while self.b.pop().unwrap_or(' ') != ' '{ }
+            while self.b.pop().unwrap_or('_') == ' ' {}
+            while self.b.pop().unwrap_or(' ') != ' ' {}
         }
         if self.b.len() > 0 {
             self.b.push(' ')
         }
         self.b.len()
     }
-
 
     pub fn align(&mut self, previous_b_length: usize) -> Option<bool> {
         let start_from = previous_b_length + 1;
@@ -204,6 +226,11 @@ impl AlignmentTable {
     }
 }
 
+#[wasm_bindgen]
+pub fn init_panic_hook() {
+    console_error_panic_hook::set_once();
+}
+
 #[cfg(test)]
 mod tests {
     use crate::AlignmentTable;
@@ -212,8 +239,15 @@ mod tests {
     fn it_works() {
         let target = "If enacted";
         let mut t = AlignmentTable::new(&target);
-        t.type_into_b("If");
-        t.type_into_b("enacted");
-        println!("SCoredAlign scopre {:?}", t.best_scored_alignment().alignment());
+        t.type_into_b("If enabled");
+        //t.type_into_b(" enabled");
+        //let replaced = t.replace_b("If enabled");
+        println!(
+            "SCoredAlign {} scopre {:?}",
+            t.best_scored_alignment().score,
+            t.best_scored_alignment().alignment()
+        );
+        assert_eq!(t.best_scored_alignment().score, 6);
+        //println!("Repalced {}", replaced);
     }
 }

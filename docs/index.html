@@ -56,6 +56,13 @@
       font-size: 5vw;
     }
 
+    #score.debug {
+      position: relative;
+      width: 100%;
+      opacity: 100%;
+      font-size: 2em;
+    }
+
     input {
       z-index: 10;
       position: fixed;
@@ -83,8 +90,6 @@
     import init from "./pkg/typing.js";
     import * as typing from "./pkg/typing.js";
     const defaultCopy = `The male begins courtship by flying noisily, and then in a graceful, circular glide with its wings outstretched and head down. After landing, the male will go to the female with a puffed out breast, bobbing head, and loud calls. Once the pair is mated, they will often spend time preening each other's feathers.`;
-    // const defaultCopy = `this is a simple paragraph that is meant to be nice and easy to type which is why there will be mommas no periods or any capital letters so i guess this means that it cannot really be considered a paragraph but just a series of run on sentences this should help you get faster at typing as im trying not to use too many difficult words in it although testa one two thireewijef owejf oweijf owiej foweij foiwj ewoifj euwej foiwej fiow ejfoijw eiofj frAnst efaultCopy = this is a simple paragraph that is meant to be nice and easy to type which is why there will be mommas no periods or any capital letters so i guess this means that it cannot really be considered a paragraph but just a series of run on sentences this should help you get faster at typing as im trying not to use too many difficult words in it although testa one two thireewijef owejf oweijf owiej foweij foiwj ewoifj euwej foiwej fiow ejfoijw eiofj frA`;
-    // const defaultCopy = `Democrats and Republicans are already jockeying for a crucial voting bloc that soured on Donald Trump, tilted to Joe Biden and now holds the key to the second half of the president's term.`;
     console.log(defaultCopy.length)
     const defaultDuration = 30;
 
@@ -101,35 +106,16 @@
 
 
 
+    let lastSimple = "";
     function step(alignment, e) {
-       debug += "STEP. "
-      if (e.data && (e.inputType === "insertText" || e.inputType === "insertFromPaste")) {
-        debug += `Simple.`;
-        let bsize = alignment.type_into_b(e.data);
-        debug += `BSIZE: ${bsize}`;
-      } else if (e.inputType === "deleteContentBackward") {
-        alignment.backspace_into_b(1);
-        log.value += ", ";
-      } else if (e.inputType === "deleteWordBackward") {
-        alignment.backword_into_b(1);
-      } else if (e.inputType === "insertCompositionText") {
-        debug += `Typing ${composition.length}->'${e.data}'`;
-        alignment.backspace_into_b(composition.length);
-        let bsize = alignment.type_into_b(e.data);
-        debug += `BSIZE: ${bsize}`;
-        composition = e.data;
-      } else {
-        debug += "UNK. "
-      }
+      debug += "STEP. "
+      let blen = alignment.replace_b(log.value);
+      console.log("Blen,", blen);
 
       let best = alignment.best_scored_alignment();
       let bestScore = best.score();
       let bestAlignment = best.alignment();
       best.free();
-      best = undefined;
-
-      debug += "B";
-      debug += "built" +  bestScore+ "!"
 
       const pairs = bestAlignment.match(/../g) || [];
       let built = pairs.reduce((acc, [a, b]) => {
@@ -158,17 +144,25 @@
 
         const alignment = typing.AlignmentTable.new(copy);
         const scoreBox = document.getElementById("score");
+        if (enableDebug) {
+          scoreBox.setAttribute("class", "debug");
+        }
         const log = document.getElementById("log");
 
+        log.addEventListener("compositionstart", (e) => {
+          debug += "<br>start compose"
+        });
+
+
         log.addEventListener("compositionend", (e) => {
+          debug += "<br>End compose"
           composition = "";
-          log.value += " ";
+          //log.value += " ";
         });
 
         let c = 0;
-        document.getElementById("log").addEventListener("beforeinput", (e) => {
+        document.getElementById("log").addEventListener("input", (e) => {
           if (completed) return;
-          debug = 'BI. '
           let aligned = step(alignment, e);
           score = aligned.score;
           let built = aligned.built;
@@ -176,7 +170,6 @@
           if (paused && built.length > 0) {
             paused = false;
             startedAt = new Date().getTime();
-            console.log("STARTD");
           }
 
           domTyped.forEach((d, i) => {
