@@ -109,8 +109,7 @@
     let lastSimple = "";
     function step(alignment, e) {
       debug += "STEP. "
-      let blen = alignment.replace_b(log.value);
-      console.log("Blen,", blen);
+      alignment.replace_b(log.value);
 
       let best = alignment.best_scored_alignment();
       let bestScore = best.score();
@@ -173,13 +172,15 @@
           }
 
           vdomTyped.forEach((vd, i) => {
-            let target = "&nbsp;";
-            if (built[i] && built[i] == " ") { target = "·"; }
-            if (built[i] && built[i] !== " ") { target = built[i]; }
-            if (vd !== target) {
-              vdomTyped[i] = target;
-              domTyped[i].innerHTML = target;
-              domTyped[i].setAttribute("class", `${built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank"} err`);
+            let targetText = "&nbsp;";
+            if (built[i] && built[i] !== " ") { targetText = built[i]; }
+
+            let targetClass = (built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank") + " err";
+
+            if (vd.text !== targetText || vd.class !== targetClass) {
+              vdomTyped[i] = {text: targetText, class: targetClass};
+              domTyped[i].innerHTML = targetText;
+              domTyped[i].setAttribute("class", targetClass);
             }
           });
 
@@ -225,13 +226,13 @@
           }
         }).map(segment => `<span class="word-wrapper">${segment.split("").map((c, i) => `
           <span class="letter">
-            <p>${c != " " ? c : "&nbsp;"}</p>
-            <p id="domTyped${letterCount++}" class="err">${built[i] || "&nbsp;"}</p>
+            <p>${c != " " ? c : "&nbsp; "}</p>
+            <p id="domTyped${letterCount++}" class="blank err">&nbsp;</p>
           </span>`).join("")}</span>`).join("");
 
         for (let i = 0; i < copy.length; i++) {
           domTyped.push(document.getElementById(`domTyped${i}`));
-          vdomTyped.push(domTyped[i].innerHTML);
+          vdomTyped.push({text: "&nbsp;", class: "blank err"});
         }
 
       });
