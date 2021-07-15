@@ -1,3 +1,5 @@
+#![feature(test)]
+
 use std::usize;
 
 extern crate console_error_panic_hook;
@@ -8,6 +10,11 @@ extern crate web_sys;
 use crate::CameFrom::Match;
 use crate::CameFrom::SkipA;
 use crate::CameFrom::SkipB;
+
+
+extern crate test;
+use test::Bencher;
+
 
 #[wasm_bindgen]
 #[derive(Debug)]
@@ -230,6 +237,21 @@ impl AlignmentTable {
 pub fn init_panic_hook() {
     console_error_panic_hook::set_once();
 }
+
+
+#[bench]
+fn late_chars(b: &mut test::Bencher) {
+    let copy = "The male begins courtship by flying noisily, and then in a graceful, circular glide with its wings outstretched and head down. After landing, the male will go to the female with a puffed out breast, bobbing head, and loud calls. Once the pair is mated, they will often spend time preening each other's feathers.";
+    let mut t = AlignmentTable::new(copy);
+    b.iter(|| {
+        for _i in 0..1000 {
+            t.replace_b("The male begins courtship by flying noisily, and then in a graceful, circular glide with its wings outstretched and head down. After landing, the male will go to the female with a puffed out breast, bobbing head, and loud calls. Once the pair is mated, they will often spend time preening each other's ");
+            t.replace_b("The male begins courtship by flying noisily, and then in a graceful, circular glide with its wings outstretched and head down. After landing, the male will go to the female with a puffed out breast, bobbing head, and loud calls. Once the pair is mated, they will often spend time preening each other's f");
+        }
+    })
+    //t.type_into_b(" enabled");
+}
+
 
 #[cfg(test)]
 mod tests {
