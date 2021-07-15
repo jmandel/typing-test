@@ -172,11 +172,15 @@
             startedAt = new Date().getTime();
           }
 
-          domTyped.forEach((d, i) => {
+          vdomTyped.forEach((vd, i) => {
             let target = "&nbsp;";
+            if (built[i] && built[i] == " ") { target = "·"; }
             if (built[i] && built[i] !== " ") { target = built[i]; }
-            d.innerHTML = target;
-            d.setAttribute("class", `${built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank"} err`);
+            if (vd !== target) {
+              vdomTyped[i] = target;
+              domTyped[i].innerHTML = target;
+              domTyped[i].setAttribute("class", `${built[i] === copy[i] ? "correct" : built[i] ? "incorrect" : "blank"} err`);
+            }
           });
 
           if (built.length === copy.length) {
@@ -209,6 +213,7 @@
 
         let built = [];
         let domTyped = [];
+        let vdomTyped = [];
 
         let letterCount = 0;
         let totalWords = copy.split(" ").length;
@@ -226,6 +231,7 @@
 
         for (let i = 0; i < copy.length; i++) {
           domTyped.push(document.getElementById(`domTyped${i}`));
+          vdomTyped.push(domTyped[i].innerHTML);
         }
 
       });
